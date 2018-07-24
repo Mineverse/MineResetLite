@@ -1,13 +1,5 @@
 package com.koletar.jj.mineresetlite;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.logging.Logger;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,6 +8,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
+
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * @author jjkoletar
@@ -41,6 +36,10 @@ public class Mine implements ConfigurationSerializable {
 	private int tpY = -1;
 	private int tpZ = 0;
 
+	private final double threshold;
+	private final long totalSize;
+	private long blocksLeft;
+
 	public Mine(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, String name, World world) {
 		this.minX = minX;
 		this.minY = minY;
@@ -52,6 +51,10 @@ public class Mine implements ConfigurationSerializable {
 		this.world = world;
 		composition = new HashMap<SerializableBlock, Double>();
 		resetWarnings = new LinkedList<Integer>();
+
+        this.threshold = Bukkit.getPluginManager().getPlugin("MineResetLite").getConfig().getDouble("reset-pct");
+        this.totalSize = ((long) maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
+		this.blocksLeft = this.totalSize;
 	}
 
 	public Mine(Map<String, Object> me) {
@@ -125,6 +128,16 @@ public class Mine implements ConfigurationSerializable {
 			tpY = (Integer) me.get("tpY");
 			tpZ = (Integer) me.get("tpZ");
 		}
+
+		this.threshold = Bukkit.getPluginManager().getPlugin("MineResetLite").getConfig().getDouble("reset-pct");
+        this.totalSize = ((long) maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
+
+        Object blocksLeft = me.get("blocksLeft");
+        if (blocksLeft != null) {
+            this.blocksLeft = (int) blocksLeft;
+        } else {
+            this.blocksLeft = totalSize;
+        }
 	}
 
 	public Map<String, Object> serialize() {
@@ -161,6 +174,7 @@ public class Mine implements ConfigurationSerializable {
 		me.put("tpX", tpX);
 		me.put("tpY", tpY);
 		me.put("tpZ", tpZ);
+		me.put("blocksLeft", this.blocksLeft);
 		return me;
 	}
 
@@ -275,6 +289,12 @@ public class Mine implements ConfigurationSerializable {
 		this.maxZ = maxZ;
 	}
 
+	public boolean isInRegion(int x, int y, int z) {
+        return x <= this.maxX && x >= this.minX &&
+                y <= this.maxY && y >= this.minY &&
+                z <= this.maxZ && z >= this.minZ;
+    }
+
 	public boolean isSilent() {
 		return isSilent;
 	}
@@ -309,6 +329,27 @@ public class Mine implements ConfigurationSerializable {
 		return (l.getWorld().getName().equals(getWorld().getName())) && (l.getBlockX() >= minX && l.getBlockX() <= maxX)
 				&& (l.getBlockY() >= minY && l.getBlockY() <= maxY) && (l.getBlockZ() >= minZ && l.getBlockZ() <= maxZ);
 	}
+
+	public void breakBlock(int x, int y, int z) {
+	    if (this.isInRegion(x, y, z)) {
+	        this.blocksLeft--;
+
+	        double pct = (double) this.blocksLeft / this.totalSize * 100;
+
+            for (Integer warning : resetWarnings) {
+                if (warning == (int) pct) {
+                    MineResetLite.broadcast(Phrases.phrase("mineWarningBroadcast", this, warning), this);
+                }
+            }
+
+	        if (pct <= this.threshold) {
+                if (!isSilent) {
+                    MineResetLite.broadcast(Phrases.phrase("mineAutoResetBroadcast", this), this);
+                }
+                reset();
+            }
+        }
+    }
 
 	public void reset() {
 		// Get probability map
@@ -359,6 +400,7 @@ public class Mine implements ConfigurationSerializable {
 				}
 			}
 		}
+		this.blocksLeft = this.totalSize;
 	}
 
 	public void cron() {

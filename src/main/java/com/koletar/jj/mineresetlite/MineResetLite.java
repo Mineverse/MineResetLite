@@ -1,20 +1,12 @@
 package com.koletar.jj.mineresetlite;
 
-import static com.koletar.jj.mineresetlite.Phrases.phrase;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.logging.Logger;
-
+import com.koletar.jj.mineresetlite.commands.MineCommands;
+import com.koletar.jj.mineresetlite.commands.PluginCommands;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -22,22 +14,28 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.scheduler.BukkitTask;
 
-import com.koletar.jj.mineresetlite.commands.MineCommands;
-import com.koletar.jj.mineresetlite.commands.PluginCommands;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * @author jjkoletar
  */
-public class MineResetLite extends JavaPlugin {
+public class MineResetLite extends JavaPlugin implements Listener {
+    private static final PotionEffect NV_EFFECT = new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 2);
 
 	public List<Mine> mines;
 	private Logger logger;
@@ -127,14 +125,19 @@ public class MineResetLite extends JavaPlugin {
 				logger.severe("Unable to load mine!");
 			}
 		}
-		
-		resetTaskId = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-			public void run() {
-				for (Mine mine : mines) {
-					mine.cron();
-				}
-			}
-		}, 60 * 20L, 60 * 20L);
+
+
+        if (this.getConfig().getBoolean("do-pct-reset")) {
+            Bukkit.getPluginManager().registerEvents(this, this);
+        } else {
+            resetTaskId = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+                public void run() {
+                    for (Mine mine : mines) {
+                        mine.cron();
+                    }
+                }
+            }, 60 * 20L, 60 * 20L);
+        }
 
 		try {
 			Metrics metrics = new Metrics(this);
@@ -151,7 +154,7 @@ public class MineResetLite extends JavaPlugin {
 	public void onDisable() {
 		getServer().getScheduler().cancelTask(resetTaskId);
 		getServer().getScheduler().cancelTask(saveTaskId);
-		HandlerList.unregisterAll(this);
+		HandlerList.unregisterAll((Plugin) this);
 		logger.info("MineResetLite disabled");
 	}
 
@@ -357,5 +360,38 @@ public class MineResetLite extends JavaPlugin {
 
 		return results;
 	}
+
+	@EventHandler
+    public void onBreak(BlockBreakEvent event) {
+	    Block block = event.getBlock();
+        for (Mine mine : this.mines) {
+            mine.breakBlock(block.getX(), block.getY(), block.getZ());
+        }
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent event) {
+        Location from = event.getFrom();
+        Location to = event.getTo();
+
+        int fX = from.getBlockX();
+        int fY = from.getBlockY();
+        int fZ = from.getBlockZ();
+
+        int tX = to.getBlockX();
+        int tY = to.getBlockY();
+        int tZ = to.getBlockZ();
+
+        if (Math.abs(fX - tX) >= 1 || Math.abs(fY - tY) >= 1 ||
+                Math.abs(fZ - tZ) >= 1) {
+            for (Mine mine : this.mines) {
+                if (!mine.isInRegion(fX, fY, fZ) && mine.isInRegion(tX, tY, tZ)) {
+                    event.getPlayer().addPotionEffect(NV_EFFECT);
+                } else if (mine.isInRegion(fX, fY, fZ) && !mine.isInRegion(tX, tY, tZ)) {
+                    event.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
+                }
+            }
+        }
+    }
 
 }

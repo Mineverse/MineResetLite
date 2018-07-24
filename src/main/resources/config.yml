@@ -1,2 +1,9 @@
 #Set this value to false to disable console logging of mine resets.
 consoleLogMineReset: true
+
+# To enable percentage based resets
+do-pct-reset: true
+
+# Percentage of mine left to reset
+# Out of 100%
+reset-pct: 30
