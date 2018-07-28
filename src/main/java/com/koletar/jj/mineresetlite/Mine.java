@@ -340,7 +340,7 @@ public class Mine implements ConfigurationSerializable {
 	}
 
 	public void breakBlock(int x, int y, int z) {
-	    if (this.isInRegion(x, y, z)) {
+	    if (this.isInRegion(x, y, z) && !name.equalsIgnoreCase("mp")) {
 	        this.blocksLeft--;
 
 	        double pct = (double) this.blocksLeft / this.totalSize * 100;
@@ -390,6 +390,7 @@ public class Mine implements ConfigurationSerializable {
 		}
 
 		plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new Runnable(){
+
             @Override
             public void run(){
                 FaweQueue queue = FaweAPI.createQueue(world.getName(), false);
