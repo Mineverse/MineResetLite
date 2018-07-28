@@ -1,5 +1,9 @@
 package com.koletar.jj.mineresetlite;
 
+import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.object.visitor.FastIterator;
+import com.sk89q.worldedit.Vector;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,6 +14,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 /**
@@ -39,6 +44,7 @@ public class Mine implements ConfigurationSerializable {
 	private final double threshold;
 	private final long totalSize;
 	private long blocksLeft;
+	private AtomicBoolean resettng;
 
 	public Mine(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, String name, World world) {
 		this.minX = minX;
@@ -55,6 +61,7 @@ public class Mine implements ConfigurationSerializable {
         this.threshold = Bukkit.getPluginManager().getPlugin("MineResetLite").getConfig().getDouble("reset-pct");
         this.totalSize = ((long) maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
 		this.blocksLeft = this.totalSize;
+		resettng = new AtomicBoolean();
 	}
 
 	public Mine(Map<String, Object> me) {
@@ -138,6 +145,8 @@ public class Mine implements ConfigurationSerializable {
         } else {
             this.blocksLeft = totalSize;
         }
+
+        resettng = new AtomicBoolean();
 	}
 
 	public Map<String, Object> serialize() {
@@ -352,8 +361,13 @@ public class Mine implements ConfigurationSerializable {
     }
 
 	public void reset() {
+	    if(resettng.getAndSet(true)){
+	        return;
+        }
+
+	    MineResetLite plugin = MineResetLite.getPlugin(MineResetLite.class);
 		// Get probability map
-		List<CompositionEntry> probabilityMap = mapComposition(composition);
+		final List<CompositionEntry> probabilityMap = mapComposition(composition);
 		// Pull players out
 		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 			Location l = p.getLocation();
@@ -374,33 +388,41 @@ public class Mine implements ConfigurationSerializable {
 				}
 			}
 		}
-		// Actually reset
-		Random rand = new Random();
-		for (int x = minX; x <= maxX; ++x) {
-			for (int y = minY; y <= maxY; ++y) {
-				for (int z = minZ; z <= maxZ; ++z) {
-					if (!fillMode || world.getBlockTypeIdAt(x, y, z) == 0) {
-						if (world.getBlockTypeIdAt(x, y, z) == 65 & ignoreLadders) {
-							continue;
-						}
 
-						if (y == maxY && surface != null) {
-							world.getBlockAt(x, y, z).setTypeIdAndData(surface.getBlockId(), surface.getData(), false);
-							continue;
-						}
-						double r = rand.nextDouble();
-						for (CompositionEntry ce : probabilityMap) {
-							if (r <= ce.getChance()) {
-								world.getBlockAt(x, y, z).setTypeIdAndData(ce.getBlock().getBlockId(),
-										ce.getBlock().getData(), false);
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-		this.blocksLeft = this.totalSize;
+		plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new Runnable(){
+            @Override
+            public void run(){
+                FaweQueue queue = FaweAPI.createQueue(world.getName(), false);
+                Random rand = new Random();
+
+                for (int x = minX; x <= maxX; ++x) {
+                    for (int y = minY; y <= maxY; ++y) {
+                        for (int z = minZ; z <= maxZ; ++z) {
+                            if (!fillMode) {
+                                if (y == maxY && surface != null) {
+                                    queue.setBlock(x, y, z, surface.getBlockId(), surface.getData());
+                                    continue;
+                                }
+
+                                double r = rand.nextDouble();
+                                for (CompositionEntry ce : probabilityMap) {
+                                    if (r <= ce.getChance()) {
+                                        queue.setBlock(x, y, z, ce.getBlock().getBlockId(), ce.getBlock().getData());
+                                        break;
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+
+                queue.flush();
+                blocksLeft = totalSize;
+                resettng.set(false);
+            }
+        });
+
 	}
 
 	public void cron() {
