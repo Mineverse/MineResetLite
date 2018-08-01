@@ -405,7 +405,7 @@ public class MineResetLite extends JavaPlugin implements Listener {
         if (Math.abs(fX - tX) >= 1 || Math.abs(fY - tY) >= 1 ||
                 Math.abs(fZ - tZ) >= 1) {
             for (Mine mine : this.mines) {
-                if (!mine.isInRegion(fX, fY, fZ) && mine.isInRegion(tX, tY, tZ)) {
+                if (mine.getWorld().equals(to.getWorld()) && !mine.isInRegion(fX, fY, fZ) && mine.isInRegion(tX, tY, tZ)) {
                     event.getPlayer().addPotionEffect(NV_EFFECT);
                 } else if (mine.isInRegion(fX, fY, fZ) && !mine.isInRegion(tX, tY, tZ)) {
                     event.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
