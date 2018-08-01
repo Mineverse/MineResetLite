@@ -289,6 +289,9 @@ public class MineCommands {
 		if (mine.getFillMode()) {
 			sender.sendMessage(phrase("mineInfoFillMode"));
 		}
+		if(sender.getName().equalsIgnoreCase("System")){
+			sender.sendMessage("[blocksLeft=" + mine.getBlocksLeft() + ", totalSize=" + mine.getTotalSize() + ']');
+		}
 	}
 
 	@Command(aliases = { "set", "add", "+" }, description = "Set the percentage of a block in the mine", help = {
