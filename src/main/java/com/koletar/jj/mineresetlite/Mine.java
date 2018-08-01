@@ -20,30 +20,30 @@ import java.util.logging.Logger;
 /**
  * @author jjkoletar
  */
-public class Mine implements ConfigurationSerializable {
-	private int minX;
-	private int minY;
-	private int minZ;
-	private int maxX;
-	private int maxY;
-	private int maxZ;
-	private World world;
-	private Map<SerializableBlock, Double> composition;
-	private int resetDelay;
-	private List<Integer> resetWarnings;
-	private String name;
-	private SerializableBlock surface;
-	private boolean fillMode;
-	private int resetClock;
-	private boolean isSilent;
-	private boolean ignoreLadders = false;
-	private int tpX = 0;
-	private int tpY = -1;
-	private int tpZ = 0;
+public class Mine implements ConfigurationSerializable{
+    private int minX;
+    private int minY;
+    private int minZ;
+    private int maxX;
+    private int maxY;
+    private int maxZ;
+    private World world;
+    private Map<SerializableBlock, Double> composition;
+    private int resetDelay;
+    private List<Integer> resetWarnings;
+    private String name;
+    private SerializableBlock surface;
+    private boolean fillMode;
+    private int resetClock;
+    private boolean isSilent;
+    private boolean ignoreLadders = false;
+    private int tpX = 0;
+    private int tpY = -1;
+    private int tpZ = 0;
 
-	private final double threshold;
-	private final long totalSize;
-	private long blocksLeft;
+    private final double threshold;
+    private final long totalSize;
+    private long blocksLeft;
 	private AtomicBoolean resettng;
 
 	public Mine(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, String name, World world) {
@@ -339,8 +339,8 @@ public class Mine implements ConfigurationSerializable {
 				&& (l.getBlockY() >= minY && l.getBlockY() <= maxY) && (l.getBlockZ() >= minZ && l.getBlockZ() <= maxZ);
 	}
 
-	public void breakBlock(int x, int y, int z) {
-	    if (this.isInRegion(x, y, z) && !name.equalsIgnoreCase("mp")) {
+	public void breakBlock(World world, int x, int y, int z) {
+	    if (world.equals(getWorld()) && this.isInRegion(x, y, z) && !name.equalsIgnoreCase("mp")) {
 	        this.blocksLeft--;
 
 	        double pct = (double) this.blocksLeft / this.totalSize * 100;
@@ -418,8 +418,8 @@ public class Mine implements ConfigurationSerializable {
                     }
                 }
 
-                queue.flush();
                 blocksLeft = totalSize;
+                queue.flush();
                 resettng.set(false);
             }
         });
@@ -448,7 +448,15 @@ public class Mine implements ConfigurationSerializable {
 		}
 	}
 
-	public static class CompositionEntry {
+    public long getBlocksLeft(){
+	    return blocksLeft;
+    }
+
+    public long getTotalSize(){
+	    return totalSize;
+    }
+
+    public static class CompositionEntry {
 		private SerializableBlock block;
 		private double chance;
 

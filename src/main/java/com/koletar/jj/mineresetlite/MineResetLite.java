@@ -20,6 +20,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -383,9 +385,23 @@ public class MineResetLite extends JavaPlugin implements Listener {
         }
     }
 
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+	public void onExplode(BlockExplodeEvent event) {
+		for (Block block : event.blockList()) {
+			this.handleBlockBreak(block);
+		}
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onExplode(EntityExplodeEvent event) {
+        for (Block block : event.blockList()) {
+            this.handleBlockBreak(block);
+        }
+    }
+
     private void handleBlockBreak(Block block) {
         for (Mine mine : this.mines) {
-            mine.breakBlock(block.getX(), block.getY(), block.getZ());
+            mine.breakBlock(block.getWorld(), block.getX(), block.getY(), block.getZ());
         }
     }
 
