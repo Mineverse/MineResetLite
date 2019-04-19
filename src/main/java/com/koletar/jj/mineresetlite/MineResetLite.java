@@ -132,17 +132,15 @@ public class MineResetLite extends JavaPlugin implements Listener {
 		}
 
 
-        if (this.getConfig().getBoolean("do-pct-reset")) {
-            Bukkit.getPluginManager().registerEvents(this, this);
-        } else {
-            resetTaskId = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-                public void run() {
-                    for (Mine mine : mines) {
-                        mine.cron();
-                    }
-                }
-            }, 60 * 20L, 60 * 20L);
-        }
+		Bukkit.getPluginManager().registerEvents(this, this);
+
+		resetTaskId = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+			public void run() {
+				for (Mine mine : mines) {
+					mine.cron();
+				}
+			}
+		}, 60 * 20L, 60 * 20L);
 
 		try {
 			Metrics metrics = new Metrics(this);
