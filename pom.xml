@@ -42,20 +42,6 @@
 			<artifactId>fawe-api</artifactId>
 			<version>latest</version>
 		</dependency>
-
-        <dependency>
-            <groupId>net.lightshard</groupId>
-            <artifactId>prisonbombs</artifactId>
-            <version>1.2.1</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.vk2gpz</groupId>
-            <artifactId>tokenenchant</artifactId>
-            <version>11.25.7</version>
-            <scope>provided</scope>
-        </dependency>
 	</dependencies>
 
 	<build>

@@ -3,8 +3,6 @@ package com.koletar.jj.mineresetlite;
 import com.koletar.jj.mineresetlite.commands.MineCommands;
 import com.koletar.jj.mineresetlite.commands.PluginCommands;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.vk2gpz.tokenenchant.event.TEBlockExplodeEvent;
-import net.lightshard.prisonbombs.event.BombExplodeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -141,12 +140,6 @@ public class MineResetLite extends JavaPlugin implements Listener {
 				}
 			}
 		}, 60 * 20L, 60 * 20L);
-
-		try {
-			Metrics metrics = new Metrics(this);
-			metrics.start();
-		} catch (IOException e) {
-		}
 
 		if (getServer().getPluginManager().getPlugin("PrisonMines") != null) {
 			convertPrisonMines();
@@ -367,20 +360,6 @@ public class MineResetLite extends JavaPlugin implements Listener {
 	@EventHandler(ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
 	    this.handleBlockBreak(event.getBlock());
-    }
-
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onExplode(TEBlockExplodeEvent event) {
-        for (Block block : event.blockList()) {
-            this.handleBlockBreak(block);
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onExplode(BombExplodeEvent event) {
-        for (Block block : event.getExploded()) {
-            this.handleBlockBreak(block);
-        }
     }
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
