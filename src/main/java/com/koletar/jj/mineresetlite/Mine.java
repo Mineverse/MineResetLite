@@ -389,11 +389,11 @@ public class Mine implements ConfigurationSerializable{
 			}
 		}
 
+		final FaweQueue queue = FaweAPI.createQueue(world.getName(), false);
 		plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new Runnable(){
 
             @Override
             public void run(){
-                FaweQueue queue = FaweAPI.createQueue(world.getName(), false);
                 Random rand = new Random();
 
                 for (int x = minX; x <= maxX; ++x) {
