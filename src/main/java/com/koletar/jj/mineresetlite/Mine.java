@@ -368,12 +368,15 @@ public class Mine implements ConfigurationSerializable{
 	    MineResetLite plugin = MineResetLite.getPlugin(MineResetLite.class);
 		// Get probability map
 		final List<CompositionEntry> probabilityMap = mapComposition(composition);
+
 		// Pull players out
+		Location teleportPos = getTpPos();
+
 		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 			Location l = p.getLocation();
 			if (isInside(p)) {
 				if (tpY >= 0) { // If tpY is set to something (Not -1)
-					p.teleport(getTpPos());
+					p.teleport(teleportPos);
 				} else { // No tp position set (Teleport up)
 					// make sure we find a safe location above the mine
 					Location tp = new Location(world, l.getX(), maxY + 1, l.getZ());

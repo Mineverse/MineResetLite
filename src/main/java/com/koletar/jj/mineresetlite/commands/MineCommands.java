@@ -660,6 +660,7 @@ public class MineCommands {
 		}
 		mines[0].setTpPos(player.getLocation());
 		sender.sendMessage(phrase("tpPosSet", mines[0]));
+		plugin.buffSave();
 		return;
 	}
 
@@ -680,6 +681,7 @@ public class MineCommands {
 		}
 		mines[0].setTpPos(new Location(player.getWorld(), 0, -1, 0));
 		sender.sendMessage(phrase("tpPosRemove", mines[0]));
+		plugin.buffSave();
 		return;
 	}
 }
