@@ -1,6 +1,9 @@
 package com.koletar.jj.mineresetlite;
 
 import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.bukkit.wrapper.AsyncWorld;
+import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.example.NMSMappedFaweQueue;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.visitor.FastIterator;
 import com.sk89q.worldedit.Vector;
@@ -361,11 +364,11 @@ public class Mine implements ConfigurationSerializable{
     }
 
 	public void reset() {
-	    if(resettng.getAndSet(true)){
-	        return;
-        }
+		if(resettng.getAndSet(true)){
+			return;
+		}
 
-	    MineResetLite plugin = MineResetLite.getPlugin(MineResetLite.class);
+		MineResetLite plugin = MineResetLite.getPlugin(MineResetLite.class);
 		// Get probability map
 		final List<CompositionEntry> probabilityMap = mapComposition(composition);
 
@@ -421,7 +424,9 @@ public class Mine implements ConfigurationSerializable{
                     }
                 }
 
+
                 blocksLeft = totalSize;
+								Settings.IMP.LIGHTING.MODE = 0; // Lighting breaks things
                 queue.flush();
                 resettng.set(false);
             }
