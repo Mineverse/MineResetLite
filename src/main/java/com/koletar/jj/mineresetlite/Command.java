@@ -6,57 +6,55 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Command annotation to label commands.
  * </p>
- * MRL's command system is very much based on sk89q's command system for
- * WorldEdit.
+ * MRL's command system is very much based on sk89q's command system for WorldEdit.
  *
  * @author jjkoletar
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Command {
-	/**
-	 * Aliases for the command. The first alias indicates the command's name.
-	 *
-	 * @return Aliases
-	 */
-	String[] aliases();
 
-	/**
-	 * Usage string for arguments passed to the command.
-	 *
-	 * @return
-	 */
-	String usage() default "";
+  /**
+   * Aliases for the command. The first alias indicates the command's name.
+   *
+   * @return Aliases
+   */
+  String[] aliases();
 
-	/**
-	 * @return Short description of the command's function.
-	 */
-	String description();
+  /**
+   * Usage string for arguments passed to the command.
+   */
+  String usage() default "";
 
-	/**
-	 * @return Multilined help text describing the command in full
-	 */
-	String[] help() default {};
+  /**
+   * @return Short description of the command's function.
+   */
+  String description();
 
-	/**
-	 * Permissions necessary for the execution of the command. An empty array
-	 * (the default) means the command requires no permissions.
-	 *
-	 * @return Permissions array
-	 */
-	String[] permissions() default {};
+  /**
+   * @return Multilined help text describing the command in full
+   */
+  String[] help() default {};
 
-	/**
-	 * @return Minimum number of arguments
-	 */
-	int min() default 0;
+  /**
+   * Permissions necessary for the execution of the command. An empty array (the default) means the
+   * command requires no permissions.
+   *
+   * @return Permissions array
+   */
+  String[] permissions() default {};
 
-	/**
-	 * @return Max number of arguments. -1 for unlimited
-	 */
-	int max() default -1;
+  /**
+   * @return Minimum number of arguments
+   */
+  int min() default 0;
 
-	/**
-	 * @return Does the command require a player to execute it or not?
-	 */
-	boolean onlyPlayers() default false;
+  /**
+   * @return Max number of arguments. -1 for unlimited
+   */
+  int max() default -1;
+
+  /**
+   * @return Does the command require a player to execute it or not?
+   */
+  boolean onlyPlayers() default false;
 }
