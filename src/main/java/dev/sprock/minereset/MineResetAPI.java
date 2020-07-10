@@ -7,7 +7,7 @@ import org.bukkit.block.Block;
 
 public class MineResetAPI
 {
-    public Mine getMine(World world, int x, int y, int z)
+    public static Mine getMine(World world, int x, int y, int z)
     {
         //if I have to
         for (Mine mine : MineResetLitePlugin.instance.getMines()) {
@@ -19,8 +19,8 @@ public class MineResetAPI
         return null;
     }
 
-    public Mine getMine(Block block)
+    public static Mine getMine(Block block)
     {
-        return this.getMine(block.getWorld(), block.getX(), block.getY(), block.getZ());
+        return getMine(block.getWorld(), block.getX(), block.getY(), block.getZ());
     }
 }
