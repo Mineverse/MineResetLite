@@ -5,6 +5,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import com.koletar.jj.mineresetlite.Mine;
 import com.koletar.jj.mineresetlite.commons.config.SerializableBlock;
 import org.bukkit.Material;
 import org.bukkit.World;

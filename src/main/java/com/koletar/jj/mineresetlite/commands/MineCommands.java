@@ -5,7 +5,7 @@ import static com.koletar.jj.mineresetlite.types.Phrases.phrase;
 import com.koletar.jj.mineresetlite.commons.commands.Command;
 import com.koletar.jj.mineresetlite.exceptions.InvalidCommandArgumentsException;
 import com.koletar.jj.mineresetlite.commons.StringTools;
-import com.koletar.jj.mineresetlite.types.Mine;
+import com.koletar.jj.mineresetlite.Mine;
 import com.koletar.jj.mineresetlite.MineResetLitePlugin;
 import com.koletar.jj.mineresetlite.commons.config.SerializableBlock;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -296,7 +296,7 @@ public class MineCommands {
     }
     if (sender.getName().equalsIgnoreCase("System")) {
       sender.sendMessage(
-          "[blocksLeft=" + mine.getBlocksLeft() + ", totalSize=" + mine.getTotalSize() + ']');
+          "[blocksLeft=" + mine.getBlocksLeft() + ']');
     }
   }
 

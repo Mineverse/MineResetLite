@@ -5,7 +5,6 @@ import com.koletar.jj.mineresetlite.commands.PluginCommands;
 import com.koletar.jj.mineresetlite.commons.commands.CommandManager;
 import com.koletar.jj.mineresetlite.commons.config.SerializableBlock;
 import com.koletar.jj.mineresetlite.listeners.MineListener;
-import com.koletar.jj.mineresetlite.types.Mine;
 import com.koletar.jj.mineresetlite.types.Phrases;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;

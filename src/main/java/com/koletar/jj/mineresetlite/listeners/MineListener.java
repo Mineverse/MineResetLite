@@ -1,6 +1,6 @@
 package com.koletar.jj.mineresetlite.listeners;
 
-import com.koletar.jj.mineresetlite.types.Mine;
+import com.koletar.jj.mineresetlite.Mine;
 import com.koletar.jj.mineresetlite.MineResetLitePlugin;
 import lombok.AllArgsConstructor;
 import org.bukkit.Location;

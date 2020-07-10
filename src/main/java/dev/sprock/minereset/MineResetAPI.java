@@ -1,6 +1,6 @@
 package dev.sprock.minereset;
 
-import com.koletar.jj.mineresetlite.types.Mine;
+import com.koletar.jj.mineresetlite.Mine;
 import com.koletar.jj.mineresetlite.MineResetLitePlugin;
 import org.bukkit.World;
 import org.bukkit.block.Block;

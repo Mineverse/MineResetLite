@@ -1,4 +1,4 @@
-package com.koletar.jj.mineresetlite.types;
+package com.koletar.jj.mineresetlite;
 
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.Settings;
@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import com.koletar.jj.mineresetlite.MineResetLitePlugin;
 import com.koletar.jj.mineresetlite.commons.config.SerializableBlock;
 import com.koletar.jj.mineresetlite.commons.StringTools;
+import com.koletar.jj.mineresetlite.types.Phrases;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,8 +30,8 @@ import org.bukkit.entity.Player;
  */
 public class Mine implements ConfigurationSerializable {
 
-  private final double threshold;
-  private final long totalSize;
+  private double threshold ;
+  private long totalSize = -1;
   private int minX;
   private int minY;
   private int minZ;
