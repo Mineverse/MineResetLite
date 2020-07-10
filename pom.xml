@@ -2,32 +2,29 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <artifactId>mineresetlite</artifactId>
+  <modelVersion>4.0.0</modelVersion>
 
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-        <groupId>org.apache.maven.plugins</groupId>
-        <version>3.1</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <archive>
-            <addMavenDescriptor>false</addMavenDescriptor>
-          </archive>
-          <finalName>${project.name}</finalName>
-        </configuration>
-        <groupId>org.apache.maven.plugins</groupId>
-        <version>2.1</version>
-      </plugin>
-    </plugins>
-  </build>
+  <groupId>com.koletar.jj</groupId>
+  <artifactId>mineresetlite</artifactId>
+  <name>MineResetLite</name>
+  <version>0.5.0</version>
+
+
+  <repositories>
+    <repository>
+      <id>spigotmc-repo</id>
+      <url>http://hub.spigotmc.org/nexus/content/groups/public/</url>
+    </repository>
+    <repository>
+      <id>sk89q-repo</id>
+      <url>http://maven.sk89q.com/repo/</url>
+    </repository>
+    <repository>
+      <id>fawe-repo</id>
+      <url>http://ci.athion.net/job/FastAsyncWorldEdit/ws/mvn/</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <artifactId>spigot-api</artifactId>
@@ -47,27 +44,38 @@
       <groupId>com.boydti</groupId>
       <version>latest</version>
     </dependency>
+
+    <!-- Generate Getters and setters at compilation @Getter and @Setter -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.12</version>
+    </dependency>
   </dependencies>
-  <groupId>xyz.boomclaw.plugins</groupId>
-  <modelVersion>4.0.0</modelVersion>
 
-  <name>MineResetLite</name>
 
-  <repositories>
-    <repository>
-      <id>spigotmc-repo</id>
-      <url>http://hub.spigotmc.org/nexus/content/groups/public/</url>
-    </repository>
-    <repository>
-      <id>sk89q-repo</id>
-      <url>http://maven.sk89q.com/repo/</url>
-    </repository>
-    <repository>
-      <id>fawe-repo</id>
-      <url>http://ci.athion.net/job/FastAsyncWorldEdit/ws/mvn/</url>
-    </repository>
-  </repositories>
-
-  <version>0.5.0</version>
-
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <version>3.1</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <addMavenDescriptor>false</addMavenDescriptor>
+          </archive>
+          <finalName>${project.name}</finalName>
+        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <version>2.1</version>
+      </plugin>
+    </plugins>
+  </build>
 </project>

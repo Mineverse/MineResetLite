@@ -2,6 +2,11 @@ package com.koletar.jj.mineresetlite;
 
 import com.koletar.jj.mineresetlite.commands.MineCommands;
 import com.koletar.jj.mineresetlite.commands.PluginCommands;
+import com.koletar.jj.mineresetlite.commons.commands.CommandManager;
+import com.koletar.jj.mineresetlite.commons.config.SerializableBlock;
+import com.koletar.jj.mineresetlite.listeners.MineListener;
+import com.koletar.jj.mineresetlite.types.Mine;
+import com.koletar.jj.mineresetlite.types.Phrases;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,8 +18,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
+
+import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -23,28 +29,17 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockExplodeEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 
 /**
  * @author jjkoletar
  */
-public class MineResetLite extends JavaPlugin implements Listener {
-
-  private static final PotionEffect NV_EFFECT = new PotionEffect(PotionEffectType.NIGHT_VISION,
-      Integer.MAX_VALUE, 2);
-  public static MineResetLite instance;
+public class MineResetLitePlugin extends JavaPlugin {
+  public static MineResetLitePlugin instance;
+  @Getter
   public List<Mine> mines;
   private Logger logger;
   private CommandManager commandManager;
@@ -52,33 +47,10 @@ public class MineResetLite extends JavaPlugin implements Listener {
   private int saveTaskId = -1;
   private int resetTaskId = -1;
 
-  public static void broadcast(String message, Mine mine) {
-    if (Config.getBroadcastNearbyOnly()) {
-      for (Player p : mine.getWorld().getPlayers()) {
-        if (mine.isInside(p)) {
-          p.sendMessage(message);
-        }
-      }
-      if (MineResetLite.instance.getConfig().getBoolean("consoleLogMineReset", false)) {
-        Bukkit.getLogger().info(message);
-      }
-    } else if (Config.getBroadcastInWorldOnly()) {
-      for (Player p : mine.getWorld().getPlayers()) {
-        p.sendMessage(message);
-      }
-      if (MineResetLite.instance.getConfig().getBoolean("consoleLogMineReset", false)) {
-        Bukkit.getLogger().info(message);
-      }
-    } else {
-      for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-        p.sendMessage(message);
-      }
-    }
-  }
-
+  @Override
   public void onEnable() {
-    MineResetLite.instance = this;
-    mines = new ArrayList<Mine>();
+    MineResetLitePlugin.instance = this;
+    mines = new ArrayList<>();
     logger = getLogger();
     Bukkit.getLogger().info(
         "[MineResetLite] MRL is managed and developed by Boomclaw under the Apache 2.0 license.");
@@ -134,7 +106,7 @@ public class MineResetLite extends JavaPlugin implements Listener {
       }
     }
 
-    Bukkit.getPluginManager().registerEvents(this, this);
+    Bukkit.getPluginManager().registerEvents(new MineListener(this), this);
 
     resetTaskId = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
       public void run() {
@@ -151,11 +123,37 @@ public class MineResetLite extends JavaPlugin implements Listener {
     }
   }
 
+  @Override
   public void onDisable() {
     getServer().getScheduler().cancelTask(resetTaskId);
     getServer().getScheduler().cancelTask(saveTaskId);
     HandlerList.unregisterAll((Plugin) this);
     logger.info("MineResetLite disabled");
+  }
+
+
+  public static void broadcast(String message, Mine mine) {
+    if (Config.getBroadcastNearbyOnly()) {
+      for (Player p : mine.getWorld().getPlayers()) {
+        if (mine.isInside(p)) {
+          p.sendMessage(message);
+        }
+      }
+      if (MineResetLitePlugin.instance.getConfig().getBoolean("consoleLogMineReset", false)) {
+        Bukkit.getLogger().info(message);
+      }
+    } else if (Config.getBroadcastInWorldOnly()) {
+      for (Player p : mine.getWorld().getPlayers()) {
+        p.sendMessage(message);
+      }
+      if (MineResetLitePlugin.instance.getConfig().getBoolean("consoleLogMineReset", false)) {
+        Bukkit.getLogger().info(message);
+      }
+    } else {
+      for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+        p.sendMessage(message);
+      }
+    }
   }
 
   public Material matchMaterial(String name) {
@@ -215,7 +213,7 @@ public class MineResetLite extends JavaPlugin implements Listener {
     }
 
     // Schedule save
-    final MineResetLite plugin = this;
+    final MineResetLitePlugin plugin = this;
 
     scheduler.scheduleSyncDelayedTask(this, new Runnable() {
       public void run() {
@@ -315,12 +313,12 @@ public class MineResetLite extends JavaPlugin implements Listener {
       String name = config.getString("Name");
       String[] coords = config.getString("Region").split(",");
       String world = coords[0];
-      int maxX = Integer.valueOf(coords[1]);
-      int maxY = Integer.valueOf(coords[2]);
-      int maxZ = Integer.valueOf(coords[3]);
-      int minX = Integer.valueOf(coords[4]);
-      int minY = Integer.valueOf(coords[5]);
-      int minZ = Integer.valueOf(coords[6]);
+      int maxX = Integer.parseInt(coords[1]);
+      int maxY = Integer.parseInt(coords[2]);
+      int maxZ = Integer.parseInt(coords[3]);
+      int minX = Integer.parseInt(coords[4]);
+      int minY = Integer.parseInt(coords[5]);
+      int minZ = Integer.parseInt(coords[6]);
 
       Mine mine = new Mine(minX, minY, minZ, maxX, maxY, maxZ, name, Bukkit.getWorld(world));
       mine.setSilence(false);
@@ -329,7 +327,7 @@ public class MineResetLite extends JavaPlugin implements Listener {
 
       for (String blockComposition : config.getStringList("Blocks")) {
         int id = Material.getMaterial(blockComposition.split("@")[0]).getId();
-        int percentage = Integer.valueOf(blockComposition.split("@")[1].split(":")[1]);
+        int percentage = Integer.parseInt(blockComposition.split("@")[1].split(":")[1]);
         mine.getComposition().put(new SerializableBlock(id), Double.valueOf("0." + percentage));
       }
 
@@ -358,58 +356,17 @@ public class MineResetLite extends JavaPlugin implements Listener {
     return results;
   }
 
-  @EventHandler(ignoreCancelled = true)
-  public void onBreak(BlockBreakEvent event) {
-    this.handleBlockBreak(event.getBlock());
-  }
 
-  @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-  public void onExplode(BlockExplodeEvent event) {
-    for (Block block : event.blockList()) {
-      this.handleBlockBreak(block);
-    }
-  }
-
-  @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-  public void onExplode(EntityExplodeEvent event) {
-    for (Block block : event.blockList()) {
-      this.handleBlockBreak(block);
-    }
-  }
-
-  private void handleBlockBreak(Block block) {
+  public void handleBlockBreak(Block block) {
     for (Mine mine : this.mines) {
       mine.breakBlock(block.getWorld(), block.getX(), block.getY(), block.getZ());
     }
   }
 
-  @EventHandler(ignoreCancelled = true)
-  public void onMove(PlayerMoveEvent event) {
-    Location from = event.getFrom();
-    Location to = event.getTo();
 
-    int fX = from.getBlockX();
-    int fY = from.getBlockY();
-    int fZ = from.getBlockZ();
 
-    int tX = to.getBlockX();
-    int tY = to.getBlockY();
-    int tZ = to.getBlockZ();
-
-    if (Math.abs(fX - tX) >= 1 || Math.abs(fY - tY) >= 1 ||
-        Math.abs(fZ - tZ) >= 1) {
-      for (Mine mine : this.mines) {
-        if (mine.getWorld().equals(to.getWorld()) && !mine.isInRegion(fX, fY, fZ) && mine
-            .isInRegion(tX, tY, tZ)) {
-          event.getPlayer().addPotionEffect(NV_EFFECT);
-        } else if (mine.isInRegion(fX, fY, fZ) && !mine.isInRegion(tX, tY, tZ)) {
-          event.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
-        }
-      }
-    }
-  }
-
-  private static class IsMineFile implements FilenameFilter {
+  private static class IsMineFile implements FilenameFilter
+  {
 
     public boolean accept(File file, String s) {
       return s.contains(".mine.yml");

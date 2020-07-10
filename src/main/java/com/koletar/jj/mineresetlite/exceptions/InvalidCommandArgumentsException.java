@@ -1,4 +1,4 @@
-package com.koletar.jj.mineresetlite;
+package com.koletar.jj.mineresetlite.exceptions;
 
 /**
  * Thrown when a command's arguments were unsatisfactory.

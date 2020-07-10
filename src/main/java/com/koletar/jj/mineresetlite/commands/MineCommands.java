@@ -1,13 +1,13 @@
 package com.koletar.jj.mineresetlite.commands;
 
-import static com.koletar.jj.mineresetlite.Phrases.phrase;
+import static com.koletar.jj.mineresetlite.types.Phrases.phrase;
 
-import com.koletar.jj.mineresetlite.Command;
-import com.koletar.jj.mineresetlite.InvalidCommandArgumentsException;
-import com.koletar.jj.mineresetlite.Mine;
-import com.koletar.jj.mineresetlite.MineResetLite;
-import com.koletar.jj.mineresetlite.SerializableBlock;
-import com.koletar.jj.mineresetlite.StringTools;
+import com.koletar.jj.mineresetlite.commons.commands.Command;
+import com.koletar.jj.mineresetlite.exceptions.InvalidCommandArgumentsException;
+import com.koletar.jj.mineresetlite.commons.StringTools;
+import com.koletar.jj.mineresetlite.types.Mine;
+import com.koletar.jj.mineresetlite.MineResetLitePlugin;
+import com.koletar.jj.mineresetlite.commons.config.SerializableBlock;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import java.util.HashMap;
@@ -27,11 +27,11 @@ import org.bukkit.util.Vector;
  */
 public class MineCommands {
 
-  private MineResetLite plugin;
+  private MineResetLitePlugin plugin;
   private Map<Player, Location> point1;
   private Map<Player, Location> point2;
 
-  public MineCommands(MineResetLite plugin) {
+  public MineCommands(MineResetLitePlugin plugin) {
     this.plugin = plugin;
     point1 = new HashMap<Player, Location>();
     point2 = new HashMap<Player, Location>();
@@ -447,7 +447,7 @@ public class MineCommands {
       // Silent reset
       mines[0].reset();
     } else {
-      MineResetLite.broadcast(phrase("mineResetBroadcast", mines[0], sender), mines[0]);
+      MineResetLitePlugin.broadcast(phrase("mineResetBroadcast", mines[0], sender), mines[0]);
       mines[0].reset();
     }
   }

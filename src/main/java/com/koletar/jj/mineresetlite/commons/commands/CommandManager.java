@@ -1,6 +1,6 @@
-package com.koletar.jj.mineresetlite;
+package com.koletar.jj.mineresetlite.commons.commands;
 
-import static com.koletar.jj.mineresetlite.Phrases.phrase;
+import static com.koletar.jj.mineresetlite.types.Phrases.phrase;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import com.koletar.jj.mineresetlite.exceptions.InvalidCommandArgumentsException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

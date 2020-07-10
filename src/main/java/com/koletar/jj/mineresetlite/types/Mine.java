@@ -1,4 +1,4 @@
-package com.koletar.jj.mineresetlite;
+package com.koletar.jj.mineresetlite.types;
 
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.Settings;
@@ -11,6 +11,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
+
+import com.koletar.jj.mineresetlite.MineResetLitePlugin;
+import com.koletar.jj.mineresetlite.commons.config.SerializableBlock;
+import com.koletar.jj.mineresetlite.commons.StringTools;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -62,8 +66,7 @@ public class Mine implements ConfigurationSerializable {
     composition = new HashMap<SerializableBlock, Double>();
     resetWarnings = new LinkedList<Integer>();
 
-    this.threshold = Bukkit.getPluginManager().getPlugin("MineResetLite").getConfig()
-        .getDouble("reset-pct");
+    this.threshold = MineResetLitePlugin.instance.getConfig().getDouble("reset-pct");
     this.totalSize = ((long) maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
     this.blocksLeft = this.totalSize;
     resettng = new AtomicBoolean();
@@ -379,13 +382,13 @@ public class Mine implements ConfigurationSerializable {
 
       for (Integer warning : resetWarnings) {
         if (warning == (int) pct) {
-          MineResetLite.broadcast(Phrases.phrase("mineWarningBroadcast", this, warning), this);
+          MineResetLitePlugin.broadcast(Phrases.phrase("mineWarningBroadcast", this, warning), this);
         }
       }
 
       if (pct <= this.threshold) {
         if (!isSilent) {
-          MineResetLite.broadcast(Phrases.phrase("mineAutoResetBroadcast", this), this);
+          MineResetLitePlugin.broadcast(Phrases.phrase("mineAutoResetBroadcast", this), this);
         }
         reset();
       }
@@ -397,7 +400,6 @@ public class Mine implements ConfigurationSerializable {
       return;
     }
 
-    MineResetLite plugin = MineResetLite.getPlugin(MineResetLite.class);
     // Get probability map
     final List<CompositionEntry> probabilityMap = mapComposition(composition);
 
@@ -426,10 +428,7 @@ public class Mine implements ConfigurationSerializable {
     }
 
     final FaweQueue queue = FaweAPI.createQueue(world.getName(), false);
-    plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new Runnable() {
-
-      @Override
-      public void run() {
+    Bukkit.getScheduler().runTaskAsynchronously(MineResetLitePlugin.instance, () -> {
         Random rand = new Random();
 
         for (int x = minX; x <= maxX; ++x) {
@@ -458,7 +457,6 @@ public class Mine implements ConfigurationSerializable {
         Settings.IMP.LIGHTING.MODE = 0; // Lighting breaks things
         queue.flush();
         resettng.set(false);
-      }
     });
 
   }
@@ -472,7 +470,7 @@ public class Mine implements ConfigurationSerializable {
     }
     if (resetClock == 0) {
       if (!isSilent) {
-        MineResetLite.broadcast(Phrases.phrase("mineAutoResetBroadcast", this), this);
+        MineResetLitePlugin.broadcast(Phrases.phrase("mineAutoResetBroadcast", this), this);
       }
       reset();
       resetClock = resetDelay;
@@ -480,7 +478,7 @@ public class Mine implements ConfigurationSerializable {
     }
     for (Integer warning : resetWarnings) {
       if (warning == resetClock) {
-        MineResetLite.broadcast(Phrases.phrase("mineWarningBroadcast", this, warning), this);
+        MineResetLitePlugin.broadcast(Phrases.phrase("mineWarningBroadcast", this, warning), this);
       }
     }
   }

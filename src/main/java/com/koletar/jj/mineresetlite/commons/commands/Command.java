@@ -1,4 +1,4 @@
-package com.koletar.jj.mineresetlite;
+package com.koletar.jj.mineresetlite.commons.commands;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
