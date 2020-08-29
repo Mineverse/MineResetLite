@@ -45,30 +45,30 @@ public class MineListener implements Listener
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onMove(PlayerMoveEvent event)
-    {
-        Location from = event.getFrom();
-        Location to = event.getTo();
-
-        int fX = from.getBlockX();
-        int fY = from.getBlockY();
-        int fZ = from.getBlockZ();
-
-        int tX = to.getBlockX();
-        int tY = to.getBlockY();
-        int tZ = to.getBlockZ();
-
-        if (Math.abs(fX - tX) >= 1 || Math.abs(fY - tY) >= 1 ||
-                Math.abs(fZ - tZ) >= 1) {
-            for (Mine mine : plugin.getMines()) {
-                if (mine.getWorld().equals(to.getWorld()) && !mine.isInRegion(fX, fY, fZ) && mine
-                        .isInRegion(tX, tY, tZ)) {
-                    event.getPlayer().addPotionEffect(NV_EFFECT);
-                } else if (mine.isInRegion(fX, fY, fZ) && !mine.isInRegion(tX, tY, tZ)) {
-                    event.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
-                }
-            }
-        }
-    }
+//    @EventHandler(ignoreCancelled = true)
+//    public void onMove(PlayerMoveEvent event)
+//    {
+//        Location from = event.getFrom();
+//        Location to = event.getTo();
+//
+//        int fX = from.getBlockX();
+//        int fY = from.getBlockY();
+//        int fZ = from.getBlockZ();
+//
+//        int tX = to.getBlockX();
+//        int tY = to.getBlockY();
+//        int tZ = to.getBlockZ();
+//
+//        if (Math.abs(fX - tX) >= 1 || Math.abs(fY - tY) >= 1 ||
+//                Math.abs(fZ - tZ) >= 1) {
+//            for (Mine mine : plugin.getMines()) {
+//                if (mine.getWorld().equals(to.getWorld()) && !mine.isInRegion(fX, fY, fZ) && mine
+//                        .isInRegion(tX, tY, tZ)) {
+//                    event.getPlayer().addPotionEffect(NV_EFFECT);
+//                } else if (mine.isInRegion(fX, fY, fZ) && !mine.isInRegion(tX, tY, tZ)) {
+//                    event.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
+//                }
+//            }
+//        }
+//    }
 }
